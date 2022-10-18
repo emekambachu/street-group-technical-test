@@ -5,8 +5,16 @@
  */
 
 require('./bootstrap');
+import {
+    createApp
+} from 'vue';
+import router from './routes';
+import axios from 'axios';
+// import VueAxios from 'vue-axios';
 
-window.Vue = require('vue').default;
+// Sweet Alert
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 
 /**
  * The following block of code may be used to automatically register your
@@ -19,7 +27,7 @@ window.Vue = require('vue').default;
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+import UploadComponent from "./components/UploadComponent";
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -27,6 +35,8 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const app = new Vue({
-    el: '#app',
-});
+createApp({
+    components: {
+        UploadComponent,
+    }
+}).use(router, axios).mount('#app');
