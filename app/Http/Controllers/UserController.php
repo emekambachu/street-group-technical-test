@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function index(){
         try {
-            $data = $this->user->user();
+            $data = $this->user->user()->get();
             return response()->json([
                 'success' => true,
                 'users' => $data,
@@ -28,13 +28,12 @@ class UserController extends Controller
         }
     }
 
-    public function importCsv(){
+    public function importCsv(Request $request){
         try {
-            $data = $this->user->user();
+            $this->user->importFile($request);
             return response()->json([
                 'success' => true,
-                'users' => $data,
-                'total' => $data->count(),
+                'message' => 'Imported',
             ]);
         } catch (\Exception $e) {
             return response()->json([
