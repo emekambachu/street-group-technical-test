@@ -4,5 +4,7 @@
 - Vue 3
 
 ## Installations (Packages)
+- Run "composer install"
+- Run "npm install"
 - Installed laravel vue ui
 - Installed service class generator
