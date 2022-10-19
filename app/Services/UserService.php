@@ -27,7 +27,6 @@ class UserService
                     if($cValue === 'homeowner'){
                         continue;
                     }
-                    //echo $cValue . "\n";
                     $nameArray = explode(' ', $cValue);
                     if(in_array($nameArray[0], $this->userTitles, true) && in_array($nameArray[1], $this->and, true)){
                         $lastNamekey = array_key_last($nameArray);

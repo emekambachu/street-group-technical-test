@@ -19,7 +19,7 @@
                         </div>
                         <button v-if="!loading" class="btn btn-info" type="submit">Import</button>
                         <div v-else>
-                            <i class="text-center">Loading</i>
+                            <i class="text-center">Loading</i><br>
                             <i class="fa fa-spin fa-spinner fa-2x text-center"></i>
                         </div>
                     </form>
