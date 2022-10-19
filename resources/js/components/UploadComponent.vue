@@ -17,43 +17,48 @@
                                   class="ml-2 fa fa-times text-danger"
                                   title="Remove image"></span>
                         </div>
-                        <button class="btn btn-info" type="submit">Import</button>
+                        <button v-if="!loading" class="btn btn-info" type="submit">Import</button>
+                        <div v-else>
+                            <i class="text-center">Loading</i>
+                            <i class="fa fa-spin fa-spinner fa-2x text-center"></i>
+                        </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
 
     <div class="row justify-content-center mt-5">
+
         <div class="col-md-8">
             <div class="card">
-
-                <div class="card-header">Records</div>
+                <div class="card-header">Table Records</div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Title</th>
-                                <th scope="col">First Name</th>
-                                <th scope="col">Initial</th>
-                                <th scope="col">Last Name</th>
-                            </tr>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Initial</th>
+                            <th scope="col">Last Name</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(user, index) in users" :key="user.id">
-                                <th scope="row">{{ index }}</th>
-                                <td>{{ user.title }}</td>
-                                <td>{{ user.first_name }}</td>
-                                <td>{{ user.initial }}</td>
-                                <td>{{ user.last_name }}</td>
-                            </tr>
+                        <tr v-for="(user, index) in users" :key="user.id">
+                            <th scope="row">{{ index }}</th>
+                            <td>{{ user.title }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.initial }}</td>
+                            <td>{{ user.last_name }}</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
+
     </div>
 
 </template>
@@ -68,13 +73,35 @@ export default {
             filePreview: null,
             validationAlert: '',
             fileErrorMessage: '',
-            errors: [],
+            users: [],
             loading: false,
-            users: []
         }
     },
 
     methods: {
+        importFile(){
+            this.loading = true;
+            this.errors = [];
+            let formData = new FormData();
+            // iterate form object and append to formData
+            let self = this;
+            Object.keys(this.form).forEach(function(key) {
+                formData.append(key, self.form[key]);
+            });
+            // check entries
+            console.log(...formData.entries());
+            axios.post('/api/users/import/csv', formData)
+                .then((response) => {
+                    if(response.data.success === true){
+                        console.log(response.data);
+                        this.users = response.data.output;
+                    }
+                    this.loading = false;
+                }).catch((error) => {
+                console.log(error);
+            });
+        },
+
         uploadFile: function (event){
             this.validateFile(event);
             //Assign image and path to this variable
@@ -94,73 +121,10 @@ export default {
             }
         },
 
-        importFile(){
-            this.loading = true;
-            this.errors = [];
-            let formData = new FormData();
-            // iterate form object and append to formData
-            let self = this;
-            Object.keys(this.form).forEach(function(key) {
-                formData.append(key, self.form[key]);
-            });
-            // check entries
-            console.log(...formData.entries());
-            axios.post('/api/users/import/csv', formData)
-                .then((response) => {
-                    console.log(response.data);
-                    if(response.data.success === true){
-                        console.log('Completed')
-                        this.formEmpty();
-                        this.getUsers();
-                    }else{
-                        this.formError(response);
-                    }
-                    this.loading = false;
-                }).catch((error) => {
-                    console.log(error);
-                });
-        },
-
-        getUsers(){
-            axios.get('/api/users')
-                .then((response) => {
-                    console.log(response.data);
-                    if(response.data.success === true){
-                        this.users = response.data.users;
-                        console.log(response.data.users);
-                    }else{
-                        console.log(response.data.message);
-                    }
-                    this.loading = false;
-                }).catch((error) => {
-                    console.log(error);
-                });
-        },
-
-        formError(response){
-            Swal.fire({
-                icon: 'error',
-                title: 'Error Occurred',
-                showConfirmButton: false,
-                timer: 2500
-            });
-            this.errors = response.data.errors;
-            console.log(this.errors);
-            console.log(response.data.message);
-        },
-
-        formEmpty(){
-            let self = this; //you need this because *this* will refer to Object.keys below`
-            //Iterate through each object field, key is name of the object field`
-            Object.keys(this.form).forEach(function(value) {
-                self.form[value] = null;
-            });
-        },
-
     },
 
     mounted(){
-        this.getUsers();
+
     }
 }
 </script>

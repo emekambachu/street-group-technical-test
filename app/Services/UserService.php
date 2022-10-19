@@ -9,8 +9,9 @@ use App\Models\User;
  */
 class UserService
 {
-    private array $userTitles = ['Mr', 'Mrs', 'Dr', 'Mister', 'Prof'];
+    private array $userTitles = ['Mr', 'Mrs', 'Dr', 'Mister', 'Prof', 'Ms'];
     private array $and = ['And', '&', 'and'];
+    public array $output = [];
 
     public function user(): User
     {
@@ -19,23 +20,50 @@ class UserService
 
     public function importFile($request): array
     {
-        $row = 1;
         $path = $request->file('file')->getRealPath();
         if (($handle = fopen($path, 'rb')) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                $num = count($data);
-                echo "$num fields in line $row: \n";
-                $row++;
                 foreach($data as $cValue){
-                    echo $cValue . "\n";
-                    $this->storeCsvToDb($cValue);
+                    if($cValue === 'homeowner'){
+                        continue;
+                    }
+                    //echo $cValue . "\n";
+                    $nameArray = explode(' ', $cValue);
+                    if(in_array($nameArray[0], $this->userTitles, true) && in_array($nameArray[1], $this->and, true)){
+                        $lastNamekey = array_key_last($nameArray);
+                        $firstName = $nameArray[0].' '.$nameArray[$lastNamekey];
+                        $secondName = $nameArray[2].' '.$nameArray[$lastNamekey];
+                        $this->storeCsvInArray($firstName);
+                        $this->storeCsvInArray($secondName);
+                        continue;
+                    }
+                    if(array_intersect($this->and, $nameArray) && !in_array($nameArray[1], $this->and, true)){
+                        $newNameArray = explode('and', $cValue);
+                        $firstName = trim($newNameArray[0]);
+                        $secondName = trim($newNameArray[1]);
+                        $this->storeCsvInArray($firstName);
+                        $this->storeCsvInArray($secondName);
+                        continue;
+                    }
+                    $this->storeCsvInArray($cValue);
                 }
             }
-            fclose($handle);
+             fclose($handle);
         }
         return [
           'success' => true,
+          'output' => $this->output,
           'message' => 'Completed',
+        ];
+    }
+
+    public function storeCsvInArray($cValue): void
+    {
+        $this->output[] = [
+            'title' => $this->getTitle($cValue),
+            'first_name' => $this->getFirstName($cValue),
+            'initial' => $this->getInitials($cValue),
+            'last_name' => $this->getLastName($cValue),
         ];
     }
 
@@ -62,7 +90,7 @@ class UserService
     {
         $name = strtr($name, array('.' => ''));
         $nameArray = explode(' ', $name);
-        if(in_array($nameArray[0], $this->userTitles, true) && !in_array($nameArray[1], $this->and, true)){
+        if(in_array($nameArray[0], $this->userTitles, true) && !in_array($nameArray[1], $this->and, true) && strlen($nameArray[1]) > 1){
             return $nameArray[1];
         }
         return null;

@@ -18,7 +18,6 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'users' => $data,
-                'total' => $data->count(),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -28,12 +27,14 @@ class UserController extends Controller
         }
     }
 
-    public function importCsv(Request $request){
+    public function importCsv(Request $request): \Illuminate\Http\JsonResponse
+    {
         try {
-            $this->user->importFile($request);
+            $data = $this->user->importFile($request);
             return response()->json([
-                'success' => true,
-                'message' => 'Imported',
+                'success' => $data['success'],
+                'output' => $data['output'],
+                'message' => $data['message'],
             ]);
         } catch (\Exception $e) {
             return response()->json([

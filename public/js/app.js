@@ -22795,12 +22795,34 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       filePreview: null,
       validationAlert: '',
       fileErrorMessage: '',
-      errors: [],
-      loading: false,
-      users: []
+      users: [],
+      loading: false
     };
   },
   methods: {
+    importFile: function importFile() {
+      var _console,
+        _this = this;
+      this.loading = true;
+      this.errors = [];
+      var formData = new FormData();
+      // iterate form object and append to formData
+      var self = this;
+      Object.keys(this.form).forEach(function (key) {
+        formData.append(key, self.form[key]);
+      });
+      // check entries
+      (_console = console).log.apply(_console, _toConsumableArray(formData.entries()));
+      axios.post('/api/users/import/csv', formData).then(function (response) {
+        if (response.data.success === true) {
+          console.log(response.data);
+          _this.users = response.data.output;
+        }
+        _this.loading = false;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
     uploadFile: function uploadFile(event) {
       this.validateFile(event);
       //Assign image and path to this variable
@@ -22817,71 +22839,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         this.form.file = null;
         return false;
       }
-    },
-    importFile: function importFile() {
-      var _console,
-        _this = this;
-      this.loading = true;
-      this.errors = [];
-      var formData = new FormData();
-      // iterate form object and append to formData
-      var self = this;
-      Object.keys(this.form).forEach(function (key) {
-        formData.append(key, self.form[key]);
-      });
-      // check entries
-      (_console = console).log.apply(_console, _toConsumableArray(formData.entries()));
-      axios.post('/api/users/import/csv', formData).then(function (response) {
-        console.log(response.data);
-        if (response.data.success === true) {
-          console.log('Completed');
-          _this.formEmpty();
-          _this.getUsers();
-        } else {
-          _this.formError(response);
-        }
-        _this.loading = false;
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    },
-    getUsers: function getUsers() {
-      var _this2 = this;
-      axios.get('/api/users').then(function (response) {
-        console.log(response.data);
-        if (response.data.success === true) {
-          _this2.users = response.data.users;
-          console.log(response.data.users);
-        } else {
-          console.log(response.data.message);
-        }
-        _this2.loading = false;
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    },
-    formError: function formError(response) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error Occurred',
-        showConfirmButton: false,
-        timer: 2500
-      });
-      this.errors = response.data.errors;
-      console.log(this.errors);
-      console.log(response.data.message);
-    },
-    formEmpty: function formEmpty() {
-      var self = this; //you need this because *this* will refer to Object.keys below`
-      //Iterate through each object field, key is name of the object field`
-      Object.keys(this.form).forEach(function (value) {
-        self.form[value] = null;
-      });
     }
   },
-  mounted: function mounted() {
-    this.getUsers();
-  }
+  mounted: function mounted() {}
 });
 
 /***/ }),
@@ -22920,29 +22880,40 @@ var _hoisted_6 = {
 var _hoisted_7 = {
   key: 0
 };
-var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+var _hoisted_8 = {
+  key: 1,
   "class": "btn btn-info",
   type: "submit"
-}, "Import", -1 /* HOISTED */);
+};
 var _hoisted_9 = {
+  key: 2
+};
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "text-center"
+}, "Loading", -1 /* HOISTED */);
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-spin fa-spinner fa-2x text-center"
+}, null, -1 /* HOISTED */);
+var _hoisted_12 = [_hoisted_10, _hoisted_11];
+var _hoisted_13 = {
   "class": "row justify-content-center mt-5"
 };
-var _hoisted_10 = {
+var _hoisted_14 = {
   "class": "col-md-8"
 };
-var _hoisted_11 = {
+var _hoisted_15 = {
   "class": "card"
 };
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, "Records", -1 /* HOISTED */);
-var _hoisted_13 = {
+}, "Table Records", -1 /* HOISTED */);
+var _hoisted_17 = {
   "class": "card-body"
 };
-var _hoisted_14 = {
+var _hoisted_18 = {
   "class": "table table-striped"
 };
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
   scope: "col"
 }, "#"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
   scope: "col"
@@ -22953,7 +22924,7 @@ var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, "Initial"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
   scope: "col"
 }, "Last Name")])], -1 /* HOISTED */);
-var _hoisted_16 = {
+var _hoisted_20 = {
   scope: "row"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -22974,10 +22945,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "class": "ml-2 fa fa-times text-danger",
     title: "Remove image"
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_8], 32 /* HYDRATE_EVENTS */)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.users, function (user, index) {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", _hoisted_8, "Import")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, _hoisted_12))], 32 /* HYDRATE_EVENTS */)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_18, [_hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.users, function (user, index) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: user.id
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(index), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.title), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.first_name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.initial), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.last_name), 1 /* TEXT */)]);
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(index), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.title), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.first_name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.initial), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.last_name), 1 /* TEXT */)]);
   }), 128 /* KEYED_FRAGMENT */))])])])])])])], 64 /* STABLE_FRAGMENT */);
 }
 
@@ -23009,7 +22980,6 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 
-// import VueAxios from 'vue-axios';
 
 // Sweet Alert
 
