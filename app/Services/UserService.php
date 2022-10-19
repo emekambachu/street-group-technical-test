@@ -9,12 +9,16 @@ use App\Models\User;
  */
 class UserService
 {
+    private array $userTitles = ['Mr', 'Mrs', 'Dr', 'Mister', 'Prof'];
+    private array $and = ['And', '&', 'and'];
+
     public function user(): User
     {
         return new User();
     }
 
-    public function importFile($request){
+    public function importFile($request): array
+    {
         $row = 1;
         $path = $request->file('file')->getRealPath();
         if (($handle = fopen($path, 'rb')) !== FALSE) {
@@ -47,15 +51,31 @@ class UserService
     private function getTitle($name): ?string
     {
         $nameArray = explode(' ', $name);
-        foreach($nameArray as $value){
-            if(in_array($value, ['Mr', 'Mrs'])){
-                return implode('', $value);
-            }
+        if(in_array($nameArray[0], $this->userTitles, true) & !in_array($nameArray[1], $this->and, true)){
+            return implode('', $nameArray[0]);
         }
         return null;
     }
 
-    private function getFirstName($name){
+    private function getFirstName($name): ?string
+    {
+        $nameArray = explode(' ', $name);
+        if(in_array($nameArray[0], $this->userTitles, true) & !in_array($nameArray[1], $this->and, true)){
+            return implode('', $nameArray[1]);
+        }
+        return null;
+    }
+
+    private function getInitials($name): ?string
+    {
+        $nameArray = explode(' ', $name);
+        if(in_array($nameArray[0], $this->userTitles, true) & strlen($nameArray[1]) <= 2){
+            return implode('', $nameArray[1]);
+        }
+        return null;
+    }
+
+    private function getLastName($name){
 
     }
 
@@ -63,9 +83,7 @@ class UserService
 
     }
 
-    private function getLastName($name){
 
-    }
 
 
 
