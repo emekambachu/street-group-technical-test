@@ -31,9 +31,9 @@ class UserService
                     $nameArray = explode(' ', $cValue);
                     // Split double surnames. e.g Mr and Mrs Smith
                     if(in_array($nameArray[0], $this->userTitles, true) && in_array($nameArray[1], $this->and, true)){
-                        $lastNamekey = array_key_last($nameArray);
-                        $firstName = $nameArray[0].' '.$nameArray[$lastNamekey];
-                        $secondName = $nameArray[2].' '.$nameArray[$lastNamekey];
+                        $namesOnly = array_slice($nameArray,3);
+                        $firstName = $nameArray[0].' '.implode(' ',$namesOnly);
+                        $secondName = $nameArray[2].' '.implode(' ',$namesOnly);
                         // save each name in array function
                         $this->storeCsvInArray($firstName);
                         $this->storeCsvInArray($secondName);
